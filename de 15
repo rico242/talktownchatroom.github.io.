@@ -1,0 +1,130 @@
+	<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Video Call Chatroom</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+</head>
+<body>
+    <div class="video-call-container">
+        <video id="localVideo" autoplay></video>
+        <video id="remoteVideo" autoplay></video>
+    </div>
+    <button id="startCallButton">Start Call</button>
+    <button id="endCallButton" style="display: none;">End Call</button>
+    <script src="script.js"></script>
+</body>
+</html>
+ 
+<style>
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+ 
+.video-call-container {
+    display: flex;
+    gap: 10px;
+}
+ 
+video {
+    width: 300px;
+    height: 200px;
+    background-color: #000;
+}
+ 
+button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+ 
+button:hover {
+    background-color: #0056b3;
+}
+</style>
+ 
+<script>
+let videoModel;
+let audioModel;
+ 
+// Load Models
+async function loadModels() {
+    try {
+        videoModel = await tf.loadGraphModel('path/to/video/model.json');
+        audioModel = await tf.loadGraphModel('path/to/audio/model.json');
+    } catch (error) {
+        console.error('Error loading models:', error);
+    }
+}
+ 
+// Initialize Models
+loadModels().then(() => {
+    console.log('Models loaded');
+});
+document.getElementById('startCallButton').addEventListener('click', startCall);
+document.getElementById('endCallButton').addEventListener('click', endCall);
+ 
+let localStream;
+let remoteStream;
+ 
+async function startCall() {
+    try {
+        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        document.getElementById('localVideo').srcObject = localStream;
+ 
+        // Simulating remote stream
+        remoteStream = localStream;
+        document.getElementById('remoteVideo').srcObject = remoteStream;
+ 
+        document.getElementById('startCallButton').style.display = 'none';
+        document.getElementById('endCallButton').style.display = 'block';
+ 
+        analyzeStream();
+    } catch (error) {
+        console.error('Error accessing media devices:', error);
+    }
+}
+ 
+function endCall() {
+    localStream.getTracks().forEach(track => track.stop());
+    document.getElementById('localVideo').srcObject = null;
+    document.getElementById('remoteVideo').srcObject = null;
+ 
+    document.getElementById('startCallButton').style.display = 'block';
+    document.getElementById('endCallButton').style.display = 'none';
+}
+ 
+async function analyzeStream() {
+    const video = document.getElementById('remoteVideo');
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const source = audioContext.createMediaStreamSource(remoteStream);
+    const analyser = audioContext.createAnalyser();
+ 
+    source.connect(analyser);
+    analyser.fftSize = 2048;
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+ 
+    function analyze() {
+        analyser.getByteFrequencyData(dataArray);
+        // Process dataArray for audio analysis
+        requestAnimationFrame(analyze);
+    }
+ 
+    analyze();
+}
+</script>

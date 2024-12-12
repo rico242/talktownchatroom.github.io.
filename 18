@@ -1,0 +1,5 @@
+git init
+git remote add origin https://github.com/rico242/rico242.github.io.git
+git add .
+git commit -m "Initial commit"
+git push -u origin main

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Neumorphism Chatroom</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Other sections remain the same -->
+    
+    <!-- Drawing Board -->
+    <div class="drawing-board-container">
+        <h2>White Drawing Board</h2>
+        <canvas id="drawingBoard" width="800" height="600"></canvas>
+    </div>
+
+    <audio id="audio" src="path/to/your/audio/file.mp3"></audio>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+.drawing-board-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #e0e5ec;
+    border-radius: 20px;
+    box-shadow: 20px 20px 60px #babecc, -20px -20px 60px #ffffff;
+    padding: 20px;
+    margin: 20px;
+}
+
+canvas {
+    border: 2px solid #babecc;
+    border-radius: 20px;
+}
+function setup() {
+    const canvas = createCanvas(800, 600);
+    canvas.parent('drawingBoard');
+    background(255);
+}
+
+function draw() {
+    if (mouseIsPressed) {
+        stroke(0);
+        strokeWeight(4);
+        line(mouseX, mouseY, pmouseX, pmouseY);
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Neumorphism Chatroom</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Other sections remain the same -->
+    <audio id="audio" src="path/to/your/audio/file.mp3"></audio>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.1/annyang.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+if (annyang) {
+    const commands = {
+        'ban :username': (username) => controlUser('ban', username),
+        'kick :username for :duration minutes': (username, duration) => controlUser('kick', username, duration),
+        'mute :username for :duration minutes': (username, duration) => controlUser('mute', username, duration),
+    };
+
+    annyang.addCommands(commands);
+    annyang.start();
+}
+
+function controlUser(action, username, duration = null) {
+    switch (action) {
+        case 'ban':
+            alert(`User ${username} has been banned.`);
+            // Add ban logic here
+            break;
+        case 'kick':
+            alert(`User ${username} has been kicked for ${duration} minutes.`);
+            // Add kick logic here
+            break;
+        case 'mute':
+            alert(`User ${username} has been muted for ${duration} minutes.`);
+            // Add mute logic here
+            break;
+    }
+}
+const users = [
+    { username: 'Alice', role: 'user' },
+    { username: 'Bob', role: 'user' },
+    { username: 'Charlie', role: 'user' },
+    { username: 'David', role: 'user' }
+];
+
+if (annyang) {
+    const commands = {
+        'promote first user to admin': () => promoteFirstUser(),
+        'demote first admin': () => demoteFirstAdmin()
+    };
+
+    annyang.addCommands(commands);
+    annyang.start();
+}
+
+function promoteFirstUser() {
+    // Sort users alphabetically
+    users.sort((a, b) => a.username.localeCompare(b.username));
+    
+    // Find the first user who is not an admin
+    const firstUser = users.find(user => user.role === 'user');
+    
+    if (firstUser) {
+        firstUser.role = 'admin';
+        alert(`User ${firstUser.username} has been promoted to admin.`);
+    } else {
+        alert('No users available to promote.');
+    }
+}
+
+function demoteFirstAdmin() {
+    // Sort users alphabetically
+    users.sort((a, b) => a.username.localeCompare(b.username));
+    
+    // Find the first user who is an admin
+    const firstAdmin = users.find(user => user.role === 'admin');
+    
+    if (firstAdmin) {
+        firstAdmin.role = 'user';
+        alert(`Admin ${firstAdmin.username} has been demoted to user.`);
+    } else {
+        alert('No admins available to demote.');
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Neumorphism Chatroom</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Animated Buttons -->
+    <div class="animated-buttons">
+        <button onclick="showEmojis()">😊</button>
+        <button onclick="showGIFs()">GIF</button>
+        <button onclick="searchMessages()">Search</button>
+        <button onclick="uploadVideo()">Upload Video</button>
+        <button onclick="addComment()">Post Comment</button>
+    </div>
+    
+    <!-- Search Bar -->
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search messages...">
+    </div>
+
+    <!-- Chat Box -->
+    <div class="chat-box">
+        <div class="messages" id="messages"></div>
+        <div class="input-container">
+            <input type="text" id="messageInput" placeholder="Type a message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <!-- Rules Section -->
+    <div class="rules-container">
+        <h2>Chatroom Rules</h2>
+        <ul id="rulesList">
+            <li>Be respectful to others.</li>
+            <li>No cuss words or inappropriate language.</li>
+            <li>No links allowed.</li>
+            <li>No spam or repeated messages.</li>
+            <li>Report any suspicious activity to admins.</li>
+            <li>Keep the chat safe and friendly for everyone.</li>
+        </ul>
+    </div>
+
+    <!-- Terms and Policies Section -->
+    <div class="terms-container">
+        <h2>Terms and Policies</h2>
+        <p>By using this chatroom, you agree to follow the rules and keep the environment safe and friendly. Any violation may result in a ban or other actions as deemed necessary by the admins. Please refer to our detailed <a href="#">terms and policies</a> for more information.</p>
+    </div>
+
+    <!-- Reel Section -->
+    <div class="reel-container">
+        <h2>Snapchat Reel</h2>
+        <input type="file" id="videoUpload" accept="video/*">
+        <div class="reel" id="reel"></div>
+    </div>
+
+    <!-- Comment Section -->
+    <div class="comment-box">
+        <input type="text" id="commentInput" placeholder="Add a comment...">
+        <div class="comments" id="comments"></div>
+    </div>
+
+    <!-- Profile Card with Bio Update -->
+    <div class="profile-card admin">
+        <img src="path/to/admin-profile.jpg" alt="Admin Profile" class="profile-pic">
+        <img src="path/to/country-flag.jpg" alt="Country Flag" class="country-flag">
+        <span class="username">Admin Username</span>
+        <span class="badge">Staff</span>
+        <textarea id="bioInput" placeholder="Update your bio..."></textarea>
+        <button onclick="updateBio()">Update Bio</button>
+        <p class="bio" id="bioText">Admin Bio</p>
+    </div>
+
+    <audio id="audio" src="path/to/your/audio/file.mp3"></audio>
+    <script src="script.js"></script>
+</body>
+</html>
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #e0e5ec;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.animated-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.animated-buttons button {
+    background: #e0e5ec;
+    border: none;
+    border-radius: 20px;
+    box-shadow: 10px 10px 20px #babecc, -10px -10px 20px #ffffff;
+    cursor: pointer;
+    font-size: 1.5em;
+    padding: 10px 20px;
+    transition: transform 0.5s, opacity 0.5s;
+    opacity: 0;
+    transform: translateX(-100%);
+}
+
+.animated-buttons button:hover {
+    box-shadow: inset 10px 10px 20px #babecc, inset -10px -10px 20px #ffffff;
+}
+
+@keyframes slideIn {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.search-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#searchInput {
+    width: 0;
+    padding: 10px;
+    border: none;
+    border-radius: 20px;
+    box-shadow: inset 10px 10px 20px #babecc, inset -10px -10px 20px #ffffff;
+    background: #e0e5ec;
+    outline: none;
+    transition: width 0.4s ease-in-out;
+}
+
+#searchInput:focus {
+    width: 300px;
+}
+
+.chat-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: #e0e5ec;
+    border-radius: 20px;
+    box-shadow: 20px 20px 60px #babecc, -20px -20px 60px #ffffff;
+    padding: 20px;
+    width: 400px;
+    height: 400px;
+    overflow-y: auto;
+}
+
+.messages {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.input-container {
+    display: flex;
+}
+
+input {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 20px;
+    box-shadow: inset 10px 10px 20px #babecc, inset -10px -10px 20px #ffffff;
+    background: #e0e5ec;
+    outline: none;
+}
+
+button {
+    margin-left: 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    background: #e0e5ec;
+    box-shadow: 10px 10px 20px #babecc, -10px -10px 20px #ffffff;
+    cursor: pointer;
+}
+
+button:hover {
+    box-shadow: inset 10px 10px 20px #babecc, inset -10px -10px 20px #ffffff;
+}
+
+.reel-container, .comment-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #e0e5ec;
+    border-radius: 20px;
+    box-shadow: 20px 20px 60px #babecc, -20px -20px 60px #ffffff;
+    padding: 20px;
+    margin: 20px;
+}
+
+.reel {
+    width: 100%;
+    max-width: 400px;
+    overflow: hidden;
+}
+
+.reel video {
+    width: 100%;
+    border-radius: 20px;
+    margin-bottom: 10px;
+}
+
+.comment-box {
+    width: 100%;
+    max-width: 400px;
+}
+
+.comments {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.comment {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 5px 5px 15px #babecc, -5px -5px 15px #ffffff;
+    margin-bottom: 10px;
+}
+
+.comment span {
+    flex: 1;
+}
+
+.comment .reactions {
+    display: flex;
+    gap: 10px;
+}
+
+.reactions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+/* Custom Scrollbar Styles */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #e0e5ec;
+    border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, #ff7b54, #ff7b54, #ffda79);
+    border-radius: 20px;
+    transition: background-color 0.3s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(90deg, #ffda79, #ff7b54, #ff7b54);
+    cursor: pointer;
+}
+
+/* Custom Scrollbar Animation */
+@keyframes scrollbarColorChange {
+    0% {
+        background: #ff7b54;
+    }
+    50% {
+        background: #ffda79;
+    }
+    100% {
+        background: #ff7b54;
+    }
+}
+
+::-webkit-scrollbar-thumb {
+    animation: scrollbarColorChange 2s infinite;
+}
+
+.welcome-message {
+    color: #0073[_{{{CITATION{{{_1{](https://github.com/EleanorEllingson/web-dev/tree/b2f2a382e77a20fd6895677c8b8f402ac4bae352/7-bank-project%2F1-template-route%2Ftranslations%2FREADME.ko.md)

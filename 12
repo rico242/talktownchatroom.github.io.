@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Neumorphism Chatroom</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Profile Card with Friend and Blocking Features -->
+    <div class="profile-card user">
+        <img src="path/to/user-profile.jpg" alt="User Profile" class="profile-pic">
+        <span class="username">User Username</span>
+        <button onclick="addFriend('User Username')">Add Friend</button>
+        <button onclick="unfriend('User Username')">Unfriend</button>
+        <button onclick="blockUser('User Username')">Block</button>
+        <button onclick="unblockUser('User Username')">Unblock</button>
+        <button onclick="muteUser('User Username')">Mute</button>
+        <button onclick="unmuteUser('User Username')">Unmute</button>
+        <button onclick="ignoreUser('User Username')">Ignore</button>
+        <button onclick="unignoreUser('User Username')">Unignore</button>
+    </div>
+
+    <audio id="audio" src="path/to/your/audio/file.mp3"></audio>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.1/annyang.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+.profile-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #e0e5ec;
+    border-radius: 20px;
+    box-shadow: 20px 20px 60px #babecc, -20px -20px 60px #ffffff;
+    padding: 20px;
+    margin: 20px;
+}
+
+.profile-pic {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
+
+.username {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    background: #e0e5ec;
+    box-shadow: 10px 10px 20px #babecc, -10px -10px 20px #ffffff;
+    cursor: pointer;
+    margin: 5px 0;
+}
+
+button:hover {
+    background-color: #d1d9e6;
+}
+const users = [
+    { username: 'Alice', role: 'user', status: 'online' },
+    { username: 'Bob', role: 'user', status: 'online' },
+    // Add more users as needed
+];
+
+let friends = [];
+let blockedUsers = [];
+let mutedUsers = [];
+let ignoredUsers = [];
+
+// Load Machine Learning Model for Threat Detection
+async function loadThreatDetectionModel() {
+    return {
+        predict: (text) => {
+            if (text.toLowerCase().includes('threat')) {
+                return 1;
+            }
+            return 0;
+        }
+    };
+}
+
+// Initialize the model
+loadThreatDetectionModel().then((model) => {
+    threatDetectionModel = model;
+});
+
+// Add Friend
+function addFriend(username) {
+    if (!friends.includes(username)) {
+        friends.push(username);
+        alert(`${username} has been added to your friends.`);
+    }
+}
+
+// Unfriend
+function unfriend(username) {
+    friends = friends.filter(friend => friend !== username);
+    alert(`${username} has been removed from your friends.`);
+}
+
+// Block User
+function blockUser(username) {
+    if (!blockedUsers.includes(username)) {
+        blockedUsers.push(username);
+        alert(`${username} has been blocked.`);
+    }
+}
+
+// Unblock User
+function unblockUser(username) {
+    blockedUsers = blockedUsers.filter(user => user !== username);
+    alert(`${username} has been unblocked.`);
+}
+
+// Mute User
+function muteUser(username) {
+    if (!mutedUsers.includes(username)) {
+        mutedUsers.push(username);
+        alert(`${username} has been muted.`);
+    }
+}
+
+// Unmute User
+function unmuteUser(username) {
+    mutedUsers = mutedUsers.filter(user => user !== username);
+    alert(`${username} has been unmuted.`);
+}
+
+// Ignore User
+function ignoreUser(username) {
+    if (!ignoredUsers.includes(username)) {
+        ignoredUsers.push(username);
+        alert(`${username} has been ignored.`);
+    }
+}
+
+// Unignore User
+function unignoreUser(username) {
+    ignoredUsers = ignoredUsers.filter(user => user !== username);
+    alert(`${username} has been unignored.`);
+}
+
+// Update Bio
+function updateBio() {
+    const bioInput = document.getElementById('bioInput').value;
+    const bioText = document.getElementById('bioText');
+    bioText.textContent = bioInput;
+    alert('Your bio has been updated.');
+}
+
+// Update Status
+function updateStatus() {
+    const statusSelect = document.getElementById('statusSelect').value;
+    const statusText = document.getElementById('statusText');
+    statusText.textContent = `Status: ${statusSelect.charAt(0).toUpperCase() + statusSelect.slice(1)}`;
+}
+
+// Voice Commands for Admins
+if (annyang) {
+    const commands = {
+        'promote first user to admin': () => promoteFirstUser(),
+        'demote first admin': () => demoteFirstAdmin()
+    };
+
+    annyang.addCommands(commands);
+    annyang.start();
+}
+
+function promoteFirstUser() {
+    users.sort((a, b) => a.username.localeCompare(b.username));
+    const firstUser = users.find(user => user.role === 'user');
+    
+    if (firstUser) {
+        firstUser.role = 'admin';
+        alert(`User ${firstUser.username} has been promoted to admin.`);
+    } else {
+        alert('No users available to promote.');
+    }
+}
+
+function demoteFirstAdmin() {
+    users.sort((a, b) => a.username.localeCompare(b.username));
+    const firstAdmin = users.find(user => user.role === 'admin');
+    
+    if (firstAdmin) {
+        firstAdmin.role = 'user';
+        alert(`Admin ${firstAdmin.username} has been demoted to user.`);
+    } else {
+        alert('No admins available to demote.');
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Neumorphism Chatroom</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Toggle Switch for Light/Dark Mode -->
+    <div class="theme-toggle">
+        <input type="checkbox" id="themeSwitcher">
+        <label for="themeSwitcher" class="toggle">
+            <span class="toggle-circle"></span>
+        </label>
+    </div>
+
+    <!-- Other content remains the same -->
+    <audio id="audio" src="path/to/your/audio/file.mp3"></audio>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.1/annyang.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    background-color: var(--bg-color);
+    margin: 0;
+    font-family: Arial, sans-serif;
+    transition: background-color 0.5s, color 0.5s;
+}
+
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+}
+
+.toggle {
+    position: relative;
+    width: 50px;
+    height: 25px;
+    background: #ccc;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.5s;
+}
+
+.toggle input {
+    display: none;
+}
+
+.toggle-circle {
+    position: absolute;
+    top: 2.5px;
+    left: 2.5px;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.5s;
+}
+
+.toggle input:checked + .toggle .toggle-circle {
+    transform: translateX(25px);
+}
+
+.toggle input:checked + .toggle {
+    background: #4a4a4a;
+}
+
+:root {
+    --bg-color: #e0e5ec;
+    --text-color: #000;
+}
+
+body.dark-mode {
+    --bg-color: #1e1e1e;
+    --text-color: #f1f1f1;
+}
+document.addEventListener('DOMContentLoaded', () => {
+    const themeSwitcher = document.getElementById('themeSwitcher');
+    
+    themeSwitcher.addEventListener('change', () => {
+        document.body.classList.toggle('dark-mode', themeSwitcher.checked);
+    });
+
+    // Retain theme preference after page reload
+    const currentTheme = localStorage.getItem('theme');
+    if (currentTheme) {
+        document.body.classList.toggle('dark-mode', currentTheme === 'dark');
+        themeSwitcher.checked = currentTheme === 'dark';
+    }
+
+    themeSwitcher.addEventListener('change', () => {
+        const theme = themeSwitcher.checked ? 'dark' : 'light';
+        document.body.classList.toggle('dark-mode', theme === 'dark');
+        localStorage.setItem('theme', theme);
+    });
+});
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Neumorphism Chatroom</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Authentication Form -->
+    <div class="auth-container">
+        <h2>Login</h2>
+        <form id="authForm">
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <div id="chatContainer" style="display: none;">
+        <!-- Chat Box and other content here -->
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+.auth-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #e0e5ec;
+    border-radius: 20px;
+    box-shadow: 20px 20px 60px #babecc, -20px -20px 60px #ffffff;
+    padding: 20px;
+    margin: 20px;
+}
+document.getElementById('authForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    
+    // Add authentication logic here
+    if (authenticateUser(username, password)) {
+        document.getElementById('authContainer').style.display = 'none';
+        document.getElementById('chatContainer').style.display = 'block';
+    } else {
+        alert('Invalid username or password.');
+    }
+});
+
+function authenticateUser(username, password) {
+    // Mock authentication logic
+    return username === 'admin' && password === 'password';
+}
+function authenticateUser(username, password) {
+    if (username === 'admin' && password === 'password') {
+        send2FACode();
+        return true;
+    }
+    return false;
+}
+
+function send2FACode() {
+    // Mock sending 2FA code
+    alert('A 2FA code has been sent to your email.');
+}
+
+function verify2FACode(inputCode) {
+    const correctCode = '123456'; // Mock 2FA code
+    return inputCode === correctCode;
+}
+
+document.getElementById('authForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    if (authenticateUser(username, password)) {
+        const inputCode = prompt('Enter the 2FA code sent to your email:');
+        if (verify2FACode(inputCode)) {
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('chatContainer').style.display = 'block';
+        } else {
+            alert('Invalid 2FA code.');
+        }
+    } else {
+        alert('Invalid username or password.');
+    }
+});
+function filterSensitiveContent(text) {
+    const sensitiveWords = ['credit card', 'social security number'];
+    let filteredText = text;
+    sensitiveWords.forEach(word => {
+        const regex = new RegExp(`\\b${word}\\b`, 'gi');
+        filteredText = filteredText.replace(regex, '****');
+    });
+    return filteredText;
+}
+
+function sendMessage() {
+    let messageText = messageInput.value.trim();
+    if (messageText) {
+        messageText = filterSensitiveContent(messageText);
+        const messageElement = document.createElement('div');
+        messageElement.textContent = messageText;
+        messagesContainer.appendChild(messageElement);
+        messageInput.value = '';
+    }
+}
+const activityLog = [];
+
+function logActivity(action, details) {
+    const timestamp = new Date().toISOString();
+    activityLog.push({ action, details, timestamp });
+    console.log(`${timestamp}: ${action} - ${details}`);
+}
+
+function sendMessage() {
+    let messageText = messageInput.value.trim();
+    if (messageText) {
+        logActivity('Message Sent', messageText);
+        const messageElement = document.createElement('div');
+        messageElement.textContent = messageText;
+        messagesContainer.appendChild(messageElement);
+        messageInput.value = '';
+    }
+}
+
+// Example of logging a user login
+function authenticateUser(username, password) {
+    if (username === 'admin' && password === 'password') {
+        logActivity('User Login', `User: ${username}`);
+        return true;
+    }
+    return false;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Neumorphism Chatroom</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</head>
+<body>
+    <!-- Authentication Form with CAPTCHA -->
+    <div class="auth-container">
+        <h2>Login</h2>
+        <form id="authForm">
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <div class="g-recaptcha" data-sitekey="YOUR_RECAPTCHA_SITE_KEY"></div>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <div id="chatContainer" style="display: none;">
+        <!-- Chat Box and other content here -->
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+.auth-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #e0e5ec;
+    border-radius: 20px;
+    box-shadow: 20px 20px 60px #babecc, -20px -20px 60px #ffffff;
+    padding: 20px;
+    margin: 20px;
+}
+document.getElementById('authForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const recaptchaResponse = grecaptcha.getResponse();
+
+    if (authenticateUser(username, password, recaptchaResponse)) {
+        document.getElementById('authContainer').style.display = 'none';
+        document.getElementById('chatContainer').style.display = 'block';
+    } else {
+        alert('Invalid login details or CAPTCHA.');
+    }
+});
+
+function authenticateUser(username, password, recaptchaResponse) {
+    // Mock authentication logic including CAPTCHA verification
+    return username === 'admin' && password === 'password' && recaptchaResponse.length > 0;
+}
+let messageCount = 0;
+const messageLimit = 5;
+const resetTime = 60000; // 1 minute
+
+function sendMessage() {
+    let messageText = messageInput.value.trim();
+    if (messageText && messageCount < messageLimit) {
+        messageText = filterSensitiveContent(messageText);
+        const messageElement = document.createElement('div');
+        messageElement.textContent = messageText;
+        messagesContainer.appendChild(messageElement);
+        messageInput.value = '';
+        messageCount++;
+        setTimeout(() => messageCount--, resetTime);
+    } else if (messageCount >= messageLimit) {
+        alert('You are sending messages too quickly. Please wait a moment.');
+    }
+}
+const encryptionKey = 'YOUR_ENCRYPTION_KEY';
+
+function encryptMessage(message) {
+    return CryptoJS.AES.encrypt(message, encryptionKey).toString();
+}
+
+function decryptMessage(ciphertext) {
+    const bytes = CryptoJS.AES.decrypt(ciphertext, encryptionKey);
+    return bytes.toString(CryptoJS.enc.Utf8);
+}
+
+function sendMessage() {
+    let messageText = messageInput.value.trim();
+    if (messageText) {
+        const encryptedMessage = encryptMessage(messageText);
+        const messageElement = document.createElement('div');
+        messageElement.textContent = encryptedMessage; // In a real scenario, you'd decrypt for display
+        messagesContainer.appendChild(messageElement);
+        messageInput.value = '';
+    }
+}
+const languages = {
+    en: { welcome: "Welcome to the chatroom!" },
+    es: { welcome: "¡Bienvenido a la sala de chat!" },
+    fr: { welcome: "Bienvenue dans le salon de discussion!" }
+};
+
+function setLanguage(lang) {
+    document.getElementById('welcomeMessage').textContent = languages[lang].welcome;
+}
+
+document.getElementById('languageSelector').addEventListener('change', (event) => {
+    setLanguage(event.target.value);
+});
+
+// Example usage
+setLanguage('en');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Language Chatroom</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="language-selector">
+        <select id="languageSelector">
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+        </select>
+    </div>
+    <div id="welcomeMessage">Welcome to the chatroom!</div>
+
+    <audio id="audio" src="path/to/your/audio/file.mp3"></audio>
+    <script src="script.js"></script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Neumorphism Chatroom</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</head>
+<body>
+    <!-- Authentication Form with CAPTCHA -->
+    <div class="auth-container">
+        <h2>Login</h2>
+        <form id="authForm">
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <div class="g-recaptcha" data-sitekey="YOUR_RECAPTCHA_SITE_KEY"></div>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <div id="chatContainer" style="display: none;">
+        <!-- Chat Box and other content here -->
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+.auth-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #e0e5ec;
+    border-radius: 20px;
+    box-shadow: 20px 20px 60px #babecc, -20px -20px 60px #ffffff;
+    padding: 20px;
+    margin: 20px;
+}
+document.getElementById('authForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const recaptchaResponse = grecaptcha.getResponse();
+
+    if (authenticateUser(username, password, recaptchaResponse)) {
+        document.getElementById('authContainer').style.display = 'none';
+        document.getElementById('chatContainer').style.display = 'block';
+    } else {
+        alert('Invalid login details or CAPTCHA.');
+    }
+});
+
+function authenticateUser(username, password, recaptchaResponse) {
+    // Mock authentication logic including CAPTCHA verification
+    return username === 'admin' && password === 'password' && recaptchaResponse.length > 0;
+}
+let messageCount = 0;
+const messageLimit = 5;
+const resetTime = 60000; // 1 minute
+
+function sendMessage() {
+    let messageText = messageInput.value.trim();
+    if (messageText && messageCount < messageLimit) {
+        messageText = filterSensitiveContent(messageText);
+        const messageElement = document.createElement('div');
+        messageElement.textContent = messageText;
+        messagesContainer.appendChild(messageElement);
+        messageInput.value = '';
+        messageCount++;
+        setTimeout(() => messageCount--, resetTime);
+    } else if (messageCount >= messageLimit) {
+        alert('You are sending messages too quickly. Please wait a moment.');
+    }
+}
+const encryptionKey = 'YOUR_ENCRYPTION_KEY';
+
+function encryptMessage(message) {
+    return CryptoJS.AES.encrypt(message, encryptionKey).toString();
+}
+
+function decryptMessage(ciphertext) {
+    const bytes = CryptoJS.AES.decrypt(ciphertext, encryptionKey);
+    return bytes.toString(CryptoJS.enc.Utf8);
+}
+
+function sendMessage() {
+    let messageText = messageInput.value.trim();
+    if (messageText) {
+        const encryptedMessage = encryptMessage(messageText);
+        const messageElement = document.createElement('div');
+        messageElement.textContent = encryptedMessage; // In a real scenario, you'd decrypt for display
+        messagesContainer.appendChild(messageElement);
+        messageInput.value = '';
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Language Chatroom</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="language-selector">
+        <select id="languageSelector">
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+        </select>
+    </div>
+    <div id="welcomeMessage">Welcome to the chatroom!</div>
+
+    <audio id="audio" src="path/to/your/audio/file.mp3"></audio>
+    <script src="script.js"></script>
+</body>
+</html>
+const languages = {
+    en: { welcome: "Welcome to the chatroom!" },
+    es: { welcome: "¡Bienvenido a la sala de chat!" },
+    fr: { welcome: "Bienvenue dans le salon de discussion!" }
+};
+
+function setLanguage(lang) {
+    document.getElementById('welcomeMessage').textContent = languages[lang].welcome;
+}
+
+document.getElementById('languageSelector').addEventListener('change', (event) => {
+    setLanguage(event.target.value);
+});
+
+// Example usage
+setLanguage('en');
+function filterSensitiveContent(text) {
+    const sensitiveWords = ['credit card', 'social security number'];
+    let filteredText = text;
+    sensitiveWords.forEach(word => {
+        const regex = new RegExp(`\\b${word}\\b`, 'gi');
+        filteredText = filteredText.replace(regex, '****');
+    });
+    return filteredText;
+}
+
+function sendMessage() {
+    let messageText = messageInput.value.trim();
+    if (messageText) {
+        messageText = filterSensitiveContent(messageText);
+        const messageElement = document.createElement('div');
+        messageElement.textContent = messageText;
+        messagesContainer.appendChild(messageElement);
+        messageInput.value = '';
+    }
+}
+const activityLog = [];
+
+function logActivity(action, details) {
+    const timestamp = new Date().toISOString();
+    activityLog.push({ action, details, timestamp });
+    console.log(`${timestamp}: ${action} - ${details}`);
+}
+
+function sendMessage() {
+    let messageText = messageInput.value.trim();
+    if (messageText) {
+        logActivity('Message Sent', messageText);
+        const messageElement = document.createElement('div');
+        messageElement.textContent = messageText;
+        messagesContainer.appendChild(messageElement);
+        messageInput.value = '';
+    }
+}
+
+// Example of logging a user login
+function authenticateUser(username, password, recaptchaResponse) {
+    if (username === 'admin' && password === 'password' && recaptchaResponse.length > 0) {
+        logActivity('User Login', `User: ${username}`);
+        return true;
+    }
+    return false;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Neumorphism Chatroom</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Toggle Switch for Light/Dark Mode -->
+    <div class="theme-toggle">
+        <input type="checkbox" id="themeSwitcher">
+        <label for="themeSwitcher" class="toggle">
+            <span class="toggle-circle"></span>
+        </label>
+    </div>
+
+    <!-- Authentication Form with CAPTCHA -->
+    <div class="auth-container">
+        <h2>Login</h2>
+        <form id="authForm">
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <div class="g-recaptcha" data-sitekey="YOUR_RECAPTCHA_SITE_KEY"></div>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <div id="chatContainer" style="display: none;">
+        <!-- Chat Box and other content here -->
+    </div>
+
+    <audio id="audio" src="path/to/your/audio/file.mp3"></audio>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.1/annyang.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    background-color: var(--bg-color);
+    margin: 0;
+    font-family: Arial, sans-serif;
+    transition: background-color 0.5s, color 0.5s;
+}
+
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    opacity: 0;
+    animation: fadeIn 1s forwards;
+}
+
+.toggle {
+    position: relative;
+    width: 50px;
+    height: 25px;
+    background: #ccc;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.5s;
+}
+
+.toggle input {
+    display: none;
+}
+
+.toggle-circle {
+    position: absolute;
+    top: 2.5px;
+    left: 2.5px;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.5s;
+}
+
+.toggle input:checked + .toggle .toggle-circle {
+    transform: translateX(25px);
+}
+
+.toggle input:checked + .toggle {
+    background: #4a4a4a;
+}
+
+.auth-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #e0e5ec;
+    border-radius: 20px;
+    box-shadow: 20px 20px 60px #babecc, -20px -20px 60px #ffffff;
+    padding: 20px;
+    margin: 20px;
+    opacity: 0;
+    animation: slideIn 1s forwards;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-100px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+:root {
+    --bg-color: #e0e5ec;
+    --text-color: #000;
+}
+
+body.dark-mode {
+    --bg-color: #1e1e1e;
+    --text-color: #f1f1f1;
+}
+document.addEventListener('DOMContentLoaded', () => {
+    const themeSwitcher = document.getElementById('themeSwitcher');
+    
+    themeSwitcher.addEventListener('change', () => {
+        document.body.classList.toggle('dark-mode', themeSwitcher.checked);
+    });
+
+    // Retain theme preference after page reload
+    const currentTheme = localStorage.getItem('theme');
+    if (currentTheme) {
+        document.body.classList.toggle('dark-mode', currentTheme === 'dark');
+        themeSwitcher.checked = currentTheme === 'dark';
+    }
+
+    themeSwitcher.addEventListener('change', () => {
+        const theme = themeSwitcher.checked ? 'dark' : 'light';
+        document.body.classList.toggle('dark-mode', theme === 'dark');
+        localStorage.setItem('theme', theme);
+    });
+
+    document.getElementById('authForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const recaptchaResponse = grecaptcha.getResponse();
+
+        if (authenticateUser(username, password, recaptchaResponse)) {
+            document.querySelector('.auth-container').style.display = 'none';
+            document.getElementById('chatContainer').style.display = 'block';
+        } else {
+            alert('Invalid login details or CAPTCHA.');
+        }
+    });
+
+    function authenticateUser(username, password, recaptchaResponse) {
+        // Mock authentication logic including CAPTCHA verification
+        return username === 'admin' && password === 'password' && recaptchaResponse.length > 0;
+    }
+});
+.messages div {
+    opacity: 0;
+    animation: fadeInMessage 0.5s forwards;
+}
+
+@keyframes fadeInMessage {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+button {
+    margin: 5px 0;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    background: #e0e5ec;
+    box-shadow: 10px 10px 20px #babecc, -10px -10px 20px #ffffff;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+button:hover {
+    background-color: #d1d9e6;
+    transform: translateY(-2px);
+}
+const activityLog = [];
+const encryptionKey = 'YOUR_ENCRYPTION_KEY';
+
+function logActivity(action, details) {
+    const timestamp = new Date().toISOString();
+    activityLog.push({ action, details, timestamp });
+    console.log(`${timestamp}: ${action} - ${details}`);
+}
+
+function encryptMessage(message) {
+    return CryptoJS.AES.encrypt(message, encryptionKey).toString();
+}
+
+function decryptMessage(ciphertext) {
+    const bytes = CryptoJS.AES.decrypt(ciphertext, encryptionKey);
+    return bytes.toString(CryptoJS.enc.Utf8);
+}
+
+function sendMessage() {
+    let messageText = messageInput.value.trim();
+    if (messageText) {
+        logActivity('Message Sent', messageText);
+        const encryptedMessage = encryptMessage(messageText);
+        const messageElement = document.createElement('div');
+        messageElement.textContent = encryptedMessage; // In a real scenario, you'd decrypt for display
+        messagesContainer.appendChild(messageElement);
+        messageInput.value = '';
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Neumorphism Chatroom</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</head>
+<body>
+    <!-- Toggle Switch for Light/Dark Mode -->
+    <div class="theme-toggle">
+        <input type="checkbox" id="themeSwitcher">
+        <label for="themeSwitcher" class="toggle">
+            <span class="toggle-circle"></span>
+        </label>
+    </div>
+
+    <!-- Authentication Form with CAPTCHA -->
+    <div class="auth-container">
+        <h2>Login</h2>
+        <form id="authForm">
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <div class="g-recaptcha" data-sitekey="YOUR_RECAPTCHA_SITE_KEY"></div>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <div id="chatContainer" style="display: none;">
+        <!-- Chat Box and other content here -->
+        <div class="chat-box">
+            <div class="messages" id="messages"></div>
+            <div class="input-container">
+                <input type="text" id="messageInput" placeholder="Type a message...">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="audio" src="path/to/your/audio/file.mp3"></audio>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.1/annyang.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    background-color: var(--bg-color);
+    margin: 0;
+    font-family: Arial, sans-serif;
+    transition: background-color 0.5s, color 0.5s;
+}
+
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    opacity: 0;
+    animation: fadeIn 1s forwards;
+}
+
+.toggle {
+    position: relative;
+    width: 50px;
+    height: 25px;
+    background: #ccc;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.5s;
+}
+
+.toggle input {
+    display: none;
+}
+
+.toggle-circle {
+    position: absolute;
+    top: 2.5px;
+    left: 2.5px;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.5s;
+}
+
+.toggle input:checked + .toggle .toggle-circle {
+    transform: translateX(25px);
+}
+
+.toggle input:checked + .toggle {
+    background: #4a4a4a;
+}
+
+.auth-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #e0e5ec;
+    border-radius: 20px;
+    box-shadow: 20px 20px 60px #babecc, -20px -20px 60px #ffffff;
+    padding: 20px;
+    margin: 20px;
+    opacity: 0;
+    animation: slideIn 1s forwards;
+}
+
+.chat-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: #e0e5ec;
+    border-radius: 20px;
+    box-shadow: 20px 20px 60px #babecc, -20px -20px 60px #ffffff;
+    padding: 20px;
+    width: 400px;
+    height: 400px;
+    overflow-y: auto;
+    opacity: 0;
+    animation: fadeIn 1s 0.5s forwards;
+}
+
+.messages {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.input-container {
+    display: flex;
+}
+
+input {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 20px;
+    box-shadow: inset 10px 10px 20px #babecc, inset -10px -10px 20px #ffffff;
+    background: #e0e5ec;
+    outline: none;
+    transition: background-color 0.5s, box-shadow 0.5s;
+}
+
+input:focus {
+    background-color: #d1d9e6;
+    box-shadow: inset 8px 8px 16px #babecc, inset -8px -8px 16px #ffffff;
+}
+
+button {
+    margin-left: 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    background: #e0e5ec;
+    box-shadow: 10px 10px 20px #babecc, -10px -10px 20px #ffffff;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+button:hover {
+    background-color: #d1d9e6;
+    transform: translateY(-2px);
+}
+
+.messages div {
+    opacity: 0;
+    animation: fadeInMessage 0.5s forwards;
+}
+
+@keyframes fadeInMessage {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-100px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+:root {
+    --bg-color: #e0e5ec;
+    --text-color: #000;
+}
+
+body.dark-mode {
+    --bg-color: #1e1e1e;
+    --text-color: #f1f1f1;
+}
+document.addEventListener('DOMContentLoaded', () => {
+    const themeSwitcher = document.getElementById('themeSwitcher');
+    
+    themeSwitcher.addEventListener('change', () => {
+        document.body.classList.toggle('dark-mode', themeSwitcher.checked);
+    });
+
+    // Retain theme preference after page reload
+    const currentTheme = localStorage.getItem('theme');
+    if (currentTheme) {
+        document.body.classList.toggle('dark-mode', currentTheme === 'dark');
+        themeSwitcher.checked = currentTheme === 'dark';
+    }
+
+    themeSwitcher.addEventListener('change', () => {
+        const theme = themeSwitcher.checked ? 'dark' : 'light';
+        document.body.classList.toggle('dark-mode', theme === 'dark');
+        localStorage.setItem('theme', theme);
+    });
+
+    document.getElementById('authForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const recaptchaResponse = grecaptcha.getResponse();
+
+        if (authenticateUser(username, password, recaptchaResponse)) {
+            document.querySelector('.auth-container').style.display = 'none';
+            document.getElementById('chatContainer').style.display = 'block';
+        } else {
+            alert('Invalid login details or CAPTCHA.');
+        }
+    });
+
+    function authenticateUser(username, password, recaptchaResponse) {
+        // Mock authentication logic including CAPTCHA verification
+        return username === 'admin' && password === 'password' && recaptchaResponse.length > 0;
+    }
+});
+
+const activityLog = [];
+const encryptionKey = 'YOUR_ENCRYPTION_KEY';
+
+function logActivity(action, details) {
+    const timestamp = new Date().toISOString();
+    activityLog.push({ action, details, timestamp });
+    console.log(`${timestamp}: ${action} - ${details}`);
+}
+
+function encryptMessage(message) {
+    return CryptoJS.AES.encrypt(message, encryptionKey).toString();
+}
+
+function decryptMessage(ciphertext) {
+    const bytes = CryptoJS.AES.decrypt(ciphertext, encryptionKey);
+    return bytes.toString(CryptoJS.enc.Utf8);
+}
+
+function sendMessage() {
+    let messageText = messageInput.value.trim();
+    if (messageText) {
+        logActivity('Message Sent', messageText);
+        const encryptedMessage = encryptMessage(messageText);
+        const messageElement =[_{{{CITATION{{{_1{](https://github.com/EleanorEllingson/web-dev/tree/b2f2a382e77a20fd6895677c8b8f402ac4bae352/7-bank-project%2F1-template-route%2Ftranslations%2FREADME.ko.md)[_{{{CITATION{{{_2{](https://github.com/luisaph/the-code-of-music/tree/01ef3138212a81059b73e9cb24755a4d9d3de8ea/README.md)

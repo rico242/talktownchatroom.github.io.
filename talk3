@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neumorphism Chatroom with Age Verification</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="age-verification-container" id="ageVerificationContainer">
+        <h2>Age Verification</h2>
+        <label for="dob">Enter your date of birth:</label>
+        <input type="date" id="dob">
+        <button onclick="verifyAge()">Verify Age</button>
+    </div>
+    <div class="login-container" id="loginContainer" style="display: none;">
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <label for="country">Select Country:</label>
+        <select id="country">
+            <option value="">Select Country</option>
+            <option value="us">United States</option>
+            <option value="jp">Japan</option>
+            <option value="de">Germany</option>
+            <option value="fr">France</option>
+            <!-- Add more countries as needed -->
+        </select>
+        <button onclick="login()">Login</button>
+    </div>
+    <div class="chat-container" id="chatContainer" style="display: none;">
+        <div class="chat-box">
+            <div class="messages" id="messages"></div>
+            <div class="input-container">
+                <input type="text" id="messageInput" placeholder="Type a message...">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+        <button onclick="logout()">Logout</button>
+        <button onclick="startVoiceCommand()">Start Voice Command</button>
+        
+        <!-- Audio Settings -->
+        <div class="audio-settings-container">
+            <h2>Audio Settings</h2>
+            <label for="audioInputSelect">Select Audio Input:</label>
+            <select id="audioInputSelect"></select>
+            <button onclick="startAudio()">Start Audio</button>
+        </div>
+        
+        <!-- Visualization -->
+        <div class="visualization-container">
+            <canvas id="audioCanvas"></canvas>
+            <div class="controls">
+                <button id="playButton">Play</button>
+                <button id="pauseButton" style="display: none;">Pause</button>
+            </div>
+        </div>
+        
+        <!-- Profile Cards -->
+        <div class="profile-card admin">
+            <img src="path/to/admin-profile.jpg" alt="Admin Profile" class="profile-pic">
+            <img src="" alt="Country Flag" id="adminCountryFlag" class="country-flag">
+            <span class="username">Admin Username</span>
+            <p class="bio">Admin Bio</p>
+        </div>
+        <div class="profile-card user">
+            <img src="path/to/user-profile.jpg" alt="User Profile" class="profile-pic">
+            <img src="" alt="Country Flag" id="userCountryFlag" class="country-flag">
+            <span class="username">User Username</span>
+            <p class="bio">User Bio</p>
+        </div>
+        
+        <!-- Image Uploader -->
+        <div class="image-uploader">
+            <label for="imageUpload">Upload Image:</label>
+            <input type="file" id="imageUpload" accept="image/*">
+        </div>
+    </div>
+    <audio id="audio" src="path/to/your/audio/file.mp3"></audio>
+    <script src="https://cdn.jsdelivr.net/npm/nudejs@1.0.0/dist/nude.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #e0e5ec;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.age-verification-container, .login-container, .chat-container, .audio-settings-container, .visualization-container, .profile-card, .image-uploader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #e0e5ec;
+    border-radius: 20px;
+    box-shadow: 20px 20px 60px #babecc, -20px -20px 60px #ffffff;
+    padding: 20px;
+    margin: 20px;
+}
+
+canvas {
+    border-radius: 20px;
+    background: #f0f0f3;
+    box-shadow: inset 10px 10px 20px #babecc, inset -10px -10px 20px #ffffff;
+}
+
+.controls {
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    background: #e0e5ec;
+    box-shadow: 10px 10px 20px #babecc, -10px -10px 20px #ffffff;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #d1d9e6;
+}
+
+button:active {
+    background-color: #b3becd;
+}
+
+.profile-pic {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+    box-shadow: 10px 10px 20px #babecc, -10px -10px 20px #ffffff;
+}
+
+.country-flag {
+    width: 50px;
+    height: 30px;
+    margin-bottom: 10px;
+}
+
+.username {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.bio {
+    font-size: 1em;
+    text-align: center;
+}
+const audio = document.getElementById('audio');
+const canvas = document.getElementById('audioCanvas');
+const playButton = document.getElementById('playButton');
+const pauseButton = document.getElementById('pauseButton');
+const audioInputSelect = document.getElementById('audioInputSelect');
+const countryFlag = document.getElementById('countryFlag');
+const imageUpload = document.getElementById('imageUpload');
+const ctx = canvas.getContext('2d');
+
+let audioContext;
+let analyser;
+let bufferLength;
+let dataArray;
+let stream;
+
+canvas.width = window.innerWidth / 2;
+canvas.height = window.innerHeight / 3;
+
+navigator.mediaDevices.enumerateDevices().then(devices => {
+    devices.forEach(device => {
+        if (device.kind === 'audioinput') {
+            const option = document.createElement('option');
+            option.value = device.deviceId;
+            option.text = device.label || `Microphone ${audioInputSelect.length + 1}`;
+            audioInputSelect.appendChild(option);
+        }
+    });
+});
+
+audioInputSelect.addEventListener('change', async () => {
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+    }
+    stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+            deviceId: { exact: audioInputSelect.value }
+        }
+    });
+    setupAudioStream(stream);
+});
+
+function setupAudioStream(stream) {
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        bufferLength = analyser.frequencyBinCount;
+        dataArray = new Uint8Array(bufferLength);
+    }
+    const source = audioContext.createMediaStreamSource(stream);
+    source.connect(analyser);
+    animate();
+}
+
+playButton.addEventListener('click', () => {
+    audio.play();
+    playButton.style.display = 'none';
+    pauseButton.style.display = 'block';
+    animate();
+});
+
+pauseButton.addEventListener('click', () => {
+    audio.pause();
+    playButton.style.display = 'block';
+    pauseButton.style.display = 'none';
+});
+
+function animate() {
+    if (audio.paused) {
+        return;
+    }
+    requestAnimationFrame(animate);
+    analyser.getByteFrequencyData(dataArray);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const barWidth = (canvas.width / bufferLength) * 2.5;
+    let barHeight;
+    let x = 0;
+
+    for (let i = 0; i < bufferLength; i++) {
+        barHeight = dataArray[i];
+        const red = (barHeight + 100) % 255;
+        const green = (barHeight + 150) % 255;
+        const blue = (barHeight + 200) % 255;
+
+        ctx.fillStyle = `rgb(${red},${green},${blue})`;
+        ctx.fillRect(x, canvas.height - barHeight / 2, barWidth, barHeight[_{{{CITATION{{{_1{](https://github.com/EleanorEllingson/web-dev/tree/b2f2a382e77a20fd6895677c8b8f402ac4bae352/7-bank-project%2F1-template-route%2Ftranslations%2FREADME.ko.md)

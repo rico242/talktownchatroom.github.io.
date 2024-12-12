@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Talk Town Chat Room</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+</head>
+<body>
+    <header>
+        <h1>Welcome to Talk Town Chat Room</h1>
+    </header>
+    <main>
+        <div id="chat-container">
+            <div id="messages"></div>
+            <input type="text" id="chat-input" placeholder="Type a message..." autofocus>
+            <button id="send-button">Send</button>
+        </div>
+    </main>
+    <script src="scripts.js"></script> <!-- Link to your JavaScript file -->
+</body>
+</html>
+git add .
+git commit -m "Add index.html and other files"
+git push origin main
+your-project/
+├── index.html
+├── css/
+│   └── styles.css
+├── js/
+│   └── scripts.js
+cd path/to/your/project
+git add .
+git commit -m "Add index.html and other files"
+git push origin main
+ls -la
+chmod 644 index.html
+mkdir talktownchatroom
+cd talktownchatroom
+git init
+git add .
+git commit -m "Initial commit with index.html"
+git remote add origin https://github.com/rico242/talktownchatroom.git
+git push -u origin main

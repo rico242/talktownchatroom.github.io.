@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neumorphism Chatroom with Search</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Search Bar -->
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search messages...">
+        <button onclick="searchMessages()">Search</button>
+    </div>
+    
+    <!-- Chat Box -->
+    <div class="chat-box">
+        <div class="messages" id="messages"></div>
+        <div class="input-container">
+            <input type="text" id="messageInput" placeholder="Type a message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+    <audio id="audio" src="path/to/your/audio/file.mp3"></audio>
+    <script src="script.js"></script>
+</body>
+</html>
+const messageInput = document.getElementById('messageInput');
+const messagesContainer = document.getElementById('messages');
+const recentMessages = [];
+const spamThreshold = 3; // Number of allowed repeated messages before considering as spam
+let threatDetectionModel;
+
+// Load Machine Learning Model for Threat Detection
+async function loadThreatDetectionModel() {
+    // Load the pre-trained model (e.g., TensorFlow.js model)
+    // Mock function for demonstration purposes
+    return {
+        predict: (text) => {
+            // Simulate a prediction (0 = safe, 1 = threat)
+            if (text.toLowerCase().includes('threat')) {
+                return 1;
+            }
+            return 0;
+        }
+    };
+}
+
+// Initialize the model
+loadThreatDetectionModel().then((model) => {
+    threatDetectionModel = model;
+});
+
+// Welcome message function
+function welcomeUser() {
+    const welcomeMessage = document.createElement('div');
+    welcomeMessage.textContent = "Welcome to the chatroom! We're glad to have you here.";
+    welcomeMessage.classList.add('welcome-message');
+    messagesContainer.appendChild(welcomeMessage);
+}
+
+// Call the welcomeUser function on page load
+window.onload = welcomeUser;
+
+function sendMessage() {
+    const messageText = messageInput.value.trim();
+    if (messageText) {
+        if (containsURL(messageText)) {
+            alert('Links are not allowed!');
+        } else if (isRepeatedText(messageText)) {
+            alert('Spam detected! Repeated message.');
+        } else if (detectSecurityThreat(messageText)) {
+            alert('Security threat detected! Message deleted.');
+        } else {
+            const messageElement = document.createElement('div');
+            messageElement.textContent = messageText;
+            messagesContainer.appendChild(messageElement);
+
+            translateMessage(messageText, 'en').then(translatedText => {
+                const translatedMessageElement = document.createElement('div');
+                translatedMessageElement.textContent = translatedText;
+                translatedMessageElement.classList.add('translated-message');
+                messagesContainer.appendChild(translatedMessageElement);
+            });
+
+            messageInput.value = '';
+            trackMessage(messageText);
+        }
+    }
+}
+
+function containsURL(text) {
+    const urlPattern = /(https?:\/\/[^\s]+)/g;
+    return urlPattern.test(text);
+}
+
+function isRepeatedText(text) {
+    const repeats = recentMessages.filter(msg => msg === text).length;
+    return repeats >= spamThreshold;
+}
+
+function trackMessage(text) {
+    recentMessages.push(text);
+    if (recentMessages.length > spamThreshold) {
+        recentMessages.shift(); // Remove oldest message to keep the array within the threshold size
+    }
+}
+
+function detectSecurityThreat(text) {
+    if (threatDetectionModel) {
+        const prediction = threatDetectionModel.predict(text);
+        return prediction === 1; // 1 indicates a security threat
+    }
+    return false;
+}
+
+async function translateMessage(text, targetLang) {
+    const response = await fetch('https://translation.googleapis.com/language/translate/v2', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer YOUR_API_KEY'
+        },
+        body: JSON.stringify({
+            q: text,
+            target: targetLang
+        })
+    });
+    
+    const result = await response.json();
+    return result.data.translations[0].translatedText;
+}
+
+// Search Functionality
+function searchMessages() {
+    const searchInput = document.getElementById('searchInput').value.toLowerCase();
+    const messages = document.querySelectorAll('.messages div');
+    messages.forEach(message => {
+        if (message.textContent.toLowerCase().includes(searchInput)) {
+            message.style.backgroundColor = '#ffff99'; // Highlight the search result
+        } else {
+            message.style.backgroundColor = '';
+        }
+    });
+}
+
+// Reel Section
+const reelContainer = document.getElementById('reelContainer');
+const reel = document.getElementById('reel');
+const commentInput = document.getElementById('commentInput');
+const commentsContainer = document.getElementById('comments');
+
+function uploadVideo() {
+    const videoUpload = document.getElementById('videoUpload');
+    const file = videoUpload.files[0];
+    if (file) {
+        const videoElement = document.createElement('video');
+        videoElement.src = URL.createObjectURL(file);
+        videoElement.controls = true;
+        reel.appendChild(videoElement);
+        videoUpload.value = '';
+    }
+}
+
+function addComment() {
+    const commentText = commentInput.value.trim();
+    if (commentText) {
+        const commentElement = document.createElement('div');
+        commentElement.classList.add('comment');
+        commentElement.innerHTML = `
+            <span>${commentText}</span>
+            <div class="reactions">
+                <button onclick="likeComment(this)">👍</button>
+                <button onclick="dislikeComment(this)">👎</button>
+            </div>
+        `;
+        commentsContainer.appendChild(commentElement);
+        commentInput.value = '';
+    }
+}
+
+function likeComment(button) {
+    button.textContent = `👍 ${parseInt(button.textContent.split(' ')[1] || 0) + 1}`;
+}
+
+function dislikeComment(button) {
+    button.textContent = `👎 ${parseInt(button.textContent.split(' ')[1] || 0) + 1}`;
+}
+
+// Custom Scrollbar Color Change
+const scrollContainer = document.querySelector('.chat-box');
+scrollContainer.addEventListener('scroll', function() {
+    const scrollPercent = (scrollContainer.scrollTop / (scrollContainer.scrollHeight - scrollContainer.clientHeight)) * 100;
+    const color1 = `hsl(${scrollPercent}, 100%, 50%)`;
+    const color2 = `hsl(${(scrollPercent + 50) % 360}, 100%, 50%)`;
+    document.documentElement.style.setProperty('--scroll-thumb-color', `linear-gradient(90deg, ${color1}, ${color2})`);
+});
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Neumorphism Chatroom</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Search Bar -->
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search messages...">
+        <button onclick="searchMessages()">Search</button>
+    </div>
+    
+    <!-- Chat Box -->
+    <div class="chat-box">
+        <div class="messages" id="messages"></div>
+        <div class="input-container">
+            <input type="text" id="messageInput" placeholder="Type a message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+    
+    <!-- Reel Section -->
+    <div class="reel-container">
+        <h2>Snapchat Reel</h2>
+        <input type="file" id="videoUpload" accept="video/*">
+        <button onclick="uploadVideo()">Upload</button>
+        <div class="reel" id="reel"></div>
+    </div>
+
+    <!-- Comment Section -->
+    <div class="comment-box">
+        <input type="text" id="commentInput" placeholder="Add a comment...">
+        <button onclick="addComment()">Post</button>
+        <div class="comments" id="comments"></div>
+    </div>
+    <audio id="audio" src="path/to/your/audio/file.mp3"></audio>
+    <script src="script.js"></script>
+</body>
+</html>
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #e0e5ec;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.search-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#searchInput {
+    width: 0;
+    padding: 10px;
+    border: none;
+    border-radius: 20px;
+    box-shadow: inset 10px 10px 20px #babecc, inset -10px -10px 20px #ffffff;
+    background: #e0e5ec;
+    outline: none;
+    transition: width 0.4s ease-in-out;
+}
+
+#searchInput:focus {
+    width: 300px;
+}
+
+.search-container button {
+    margin-left: 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    background: #e0e5ec;
+    box-shadow: 10px 10px 20px #babecc, -10px -10px 20px #ffffff;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.search-container button:hover {
+    background-color: #d1d9e6;
+}
+
+.chat-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: #e0e5ec;
+    border-radius: 20px;
+    box-shadow: 20px 20px 60px #babecc, -20px -20px 60px #ffffff;
+    padding: 20px;
+    width: 400px;
+    height: 400px;
+    overflow-y: auto;
+}
+
+.messages {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.input-container {
+    display: flex;
+}
+
+input {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 20px;
+    box-shadow: inset 10px 10px 20px #babecc, inset -10px -10px 20px #ffffff;
+    background: #e0e5ec;
+    outline: none;
+}
+
+button {
+    margin-left: 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    background: #e0e5ec;
+    box-shadow: 10px 10px 20px #babecc, -10px -10px 20px #ffffff;
+    cursor: pointer;
+}
+
+button:hover {
+    box-shadow: inset 10px 10px 20px #babecc, inset -10px -10px 20px #ffffff;
+}
+
+.reel-container, .comment-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #e0e5ec;
+    border-radius: 20px;
+    box-shadow: 20px 20px 60px #babecc, -20px -20px 60px #ffffff;
+    padding: 20px;
+    margin: 20px;
+}
+
+.reel {
+    width: 100%;
+    max-width: 400px;
+    overflow: hidden;
+}
+
+.reel video {
+    width: 100%;
+    border-radius: 20px;
+    margin-bottom: 10px;
+}
+
+.comment-box {
+    width: 100%;
+    max-width: 400px;
+}
+
+.comments {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.comment {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 5px 5px 15px #babecc, -5px -5px 15px #ffffff;
+    margin-bottom: 10px;
+}
+
+.comment span {
+    flex: 1;
+}
+
+.comment .reactions {
+    display: flex;
+    gap: 10px;
+}
+
+.reactions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+/* Custom Scrollbar Styles */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #e0e5ec;
+    border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, #ff7b54, #ff7b54, #ffda79);
+    border-radius: 20px;
+    transition: background-color 0.3s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(90deg, #ffda79, #ff7b54, #ff7b54);
+    cursor: pointer;
+}
+
+/* Custom Scrollbar Animation */
+@keyframes scrollbarColorChange {
+    0% {
+        background: #ff7b54;
+    }
+    50% {
+        background: #ffda79;
+    }
+    100% {
+        background: #ff7b54;
+    }
+}
+
+::-webkit-scrollbar-thumb {
+    animation: scrollbarColorChange 2s infinite;
+}
+
+.welcome-message {
+    color: #0073e6;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+const messageInput = document.getElementById('messageInput');
+const messagesContainer = document.getElementById('messages');
+const recentMessages = [];
+const spamThreshold = 3; // Number of allowed repeated messages before considering as spam
+let threatDetectionModel;
+
+// Load Machine Learning Model for Threat Detection
+async function loadThreatDetectionModel() {
+    // Load the pre-trained model (e.g., TensorFlow.js model)
+    // Mock function for demonstration purposes
+    return {
+        predict: (text) => {
+            // Simulate a prediction (0 = safe, 1 = threat)
+            if (text.toLowerCase().includes('threat')) {
+                return 1;
+            }
+            return 0;
+        }
+    };
+}
+
+// Initialize the model
+loadThreatDetectionModel().then((model) => {
+    threatDetectionModel = model;
+});
+
+// Welcome message function
+function welcomeUser() {
+    const welcomeMessage = document.createElement('div');
+    welcomeMessage.textContent = "Welcome to the chatroom! We're glad to have you here.";
+    welcomeMessage.classList.add('welcome-message');
+    messagesContainer.appendChild(welcomeMessage);
+}
+
+// Call the welcomeUser function on page load
+window.onload = welcomeUser;
+
+function sendMessage() {
+    const messageText = messageInput.value.trim();
+    if (messageText) {
+        if (containsURL(messageText)) {
+            alert('Links are not allowed!');
+        } else if (isRepeatedText(messageText)) {
+            alert('Spam detected! Repeated message.');
+        } else if (detectSecurityThreat(messageText)) {
+            alert('Security threat detected! Message deleted.');
+        } else {
+            const messageElement = document.createElement('div');
+            messageElement.textContent = messageText;
+            messagesContainer.appendChild(messageElement);
+
+            translateMessage(messageText, 'en').then(translatedText => {
+                const translatedMessageElement = document.createElement('div');
+                translatedMessageElement.textContent = translatedText;
+                translatedMessageElement.classList.add('translated-message');
+                messagesContainer.appendChild(translatedMessageElement);
+            });
+
+            messageInput.value = '';
+            trackMessage(messageText);
+        }
+    }
+}
+
+function containsURL(text) {
+    const urlPattern = /(https?:\/\/[[_{{{CITATION{{{_1{](https://github.com/buribalazs/smooth-drag-order/tree/7b40d21d076c3e31765f61481f537beaf4c5ec9f/README.md)_{{{CITATION{{{_2{](https://github.com/Babii-Oleksandr/Babii-Oleksandr_GH8_CMS/tree/ddbc66b94acc5a3d11d5a0cd341998f4768af4d8/home14%2Findex.php)
